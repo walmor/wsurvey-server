@@ -1,0 +1,19 @@
+{
+  "env": {
+    "node": true,
+    "es6": true,
+    "jest": true
+  },
+  "parser": "babel-eslint",
+  "extends": "airbnb-base",
+  "plugins": ["import"],
+  "rules": {
+    "no-use-before-define": [2, { "functions": false }],
+    "prefer-const": "warn",
+    "no-plusplus": "off",
+    "no-param-reassign": ["error", { "props": false }],
+    "linebreak-style": "off",
+    "func-names": "off",
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }]
+  }
+}
