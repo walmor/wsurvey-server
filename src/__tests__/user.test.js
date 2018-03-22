@@ -183,7 +183,7 @@ describe('The User', async () => {
       });
     });
 
-    describe('when seaching by email and password', async () => {
+    describe('when searching by email and password', async () => {
       it('should find an existent user', async () => {
         const validEmail = 'john@example.com';
         const validPwd = 'password';
