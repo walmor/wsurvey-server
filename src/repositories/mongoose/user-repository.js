@@ -12,10 +12,10 @@ const userRepository = {
   },
 
   async update(user) {
-    const doc = await User.findById(user._id);
+    const doc = await User.findById(user.id);
 
     if (!doc) {
-      throw new Error(`Could not find user with id: ${user._id}`);
+      throw new Error(`Could not find user with id: ${user.id}`);
     }
 
     doc.set(user);

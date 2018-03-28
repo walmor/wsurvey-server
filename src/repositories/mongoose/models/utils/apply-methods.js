@@ -9,8 +9,15 @@ export default function applyMethods(schema, methods) {
 
   schema.set('toObject', {
     gettters: true,
+    versionKey: false,
     transform(doc, ret) {
       copyMethods(ret);
+
+      if (ret._id) {
+        ret.id = ret._id;
+        delete ret._id;
+      }
+
       return ret;
     },
   });
