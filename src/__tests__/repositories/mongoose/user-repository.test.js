@@ -1,6 +1,6 @@
 import * as mongodbInMemory from '../../utils/mongodb-in-memory';
 import { getRandomUser, saveUser } from '../../utils/user-factory';
-import expectToNotReturnMongooseModels from '../../utils/custom-expects';
+import { expectToNotReturnMongooseModels } from '../../utils/custom-expects';
 import userRepository from '../../../repositories/mongoose/user-repository';
 
 beforeAll(async () => {
@@ -92,6 +92,15 @@ describe('The user repository', async () => {
       expect(user.password).not.toBeFalsy();
       expect(user.password).not.toEqual(password);
       expect(user.password.length).toBeGreaterThan(password.length);
+    });
+
+    it.only('should save a valid user and return its id', async () => {
+      const user = getRandomUser();
+
+      const savedUser = await userRepository.create(user);
+
+      expect(user.id).not.toBeFalsy();
+      expect(savedUser.id).not.toBeFalsy();
     });
   });
 
