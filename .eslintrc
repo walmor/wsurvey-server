@@ -14,6 +14,7 @@
     "no-param-reassign": ["error", { "props": false }],
     "linebreak-style": "off",
     "func-names": "off",
-    "no-underscore-dangle": ["error", { "allow": ["_id"] }]
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }],
+    "max-len": ["error", { "code": 120, "ignoreStrings": true }]
   }
 }

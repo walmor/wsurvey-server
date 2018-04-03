@@ -94,7 +94,7 @@ describe('The user repository', async () => {
       expect(user.password.length).toBeGreaterThan(password.length);
     });
 
-    it.only('should save a valid user and return its id', async () => {
+    it('should save a valid user and return its id', async () => {
       const user = getRandomUser();
 
       const savedUser = await userRepository.create(user);

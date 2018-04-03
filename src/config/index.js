@@ -22,6 +22,16 @@ const schema = {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRESIN || '30d',
   },
+  facebook: {
+    appId: process.env.FACEBOOK_APP_ID,
+    appSecret: process.env.FACEBOOK_APP_SECRET,
+    appAccessToken() {
+      return `${this.appId}|${this.appSecret}`;
+    },
+    apiVersion: process.env.FACEBOOK_API_VERSION || 'v2.12',
+    testUserId: process.env.FACEBOOK_TEST_USER_ID,
+    testUserIdNoEmailPerm: process.env.FACEBOOK_TEST_USER_ID_NO_EMAIL_PERM,
+  },
 };
 
 // Default configurations

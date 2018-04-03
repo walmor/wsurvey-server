@@ -23,10 +23,6 @@ function socialNetworkService({ userRepository, accessTokenValidator }) {
 
       const tokenInfo = accessTokenValidator.validateToken(socialNetwork, accessToken);
 
-      if (!tokenInfo) {
-        throw err.INVALID_ACCESS_TOKEN;
-      }
-
       let user = await userRepository[findBySocialNetworkId](tokenInfo.id);
 
       if (user) {

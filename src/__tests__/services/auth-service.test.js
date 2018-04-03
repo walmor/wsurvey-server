@@ -114,7 +114,7 @@ describe('The authService', async () => {
       it('should throw an error if the token is invalid', async () => {
         const tokenValidator = {
           validateToken() {
-            return false;
+            throw err.INVALID_ACCESS_TOKEN;
           },
         };
 
@@ -202,7 +202,7 @@ describe('The authService', async () => {
       it('should throw an error if the token is invalid', async () => {
         const tokenValidator = {
           validateToken() {
-            return false;
+            throw err.INVALID_ACCESS_TOKEN;
           },
         };
 

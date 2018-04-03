@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { Model } from 'mongoose';
 import config from '../../config';
 
-async function expectToNotReturnMongooseModels(objUnderTest, methodsOpts) {
+export async function expectToNotReturnMongooseModels(objUnderTest, methodsOpts) {
   const { methodsToTest, methodsToIgnore = [] } = methodsOpts;
 
   const methods = Object.keys(objUnderTest).filter(key => typeof objUnderTest[key] === 'function');
@@ -50,4 +50,4 @@ expect.extend({
   },
 });
 
-export default { expectToNotReturnMongooseModels };
+export { expectToNotReturnMongooseModels as default };
