@@ -29,8 +29,6 @@ const schema = {
       return `${this.appId}|${this.appSecret}`;
     },
     apiVersion: process.env.FACEBOOK_API_VERSION || 'v2.12',
-    testUserId: process.env.FACEBOOK_TEST_USER_ID,
-    testUserIdNoEmailPerm: process.env.FACEBOOK_TEST_USER_ID_NO_EMAIL_PERM,
   },
 };
 

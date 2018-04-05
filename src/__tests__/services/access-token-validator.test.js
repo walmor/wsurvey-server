@@ -1,33 +1,21 @@
-import FB from 'fb';
+import nock from 'nock';
 import config from '../../config';
 import * as err from '../../services/errors/error-constants';
 import accessTokenValidator from '../../services/auth/access-token-validator';
 
-async function getFacebookTestUser({ grantedEmailPermission }) {
-  const cf = config.facebook;
-  const appAccessToken = cf.appAccessToken();
+function mockFacebookEndpoint(endpoint, query, body) {
+  nock('https://graph.facebook.com')
+    .get(`/${config.facebook.apiVersion}/${endpoint}`)
+    .query(Object.assign({}, query, { access_token: /.*/ }))
+    .reply(200, body);
+}
 
-  FB.options({
-    version: cf.apiVersion,
-    accessToken: appAccessToken,
-  });
+function mockFacebookDebugTokenEndpoint(accessToken, body) {
+  mockFacebookEndpoint('debug_token', { input_token: accessToken }, body);
+}
 
-  const testUsers = await FB.api(`${cf.appId}/accounts/test-users`);
-
-  const testUserId = grantedEmailPermission ? cf.testUserId : cf.testUserIdNoEmailPerm;
-
-  const accessToken = testUsers.data.find(tu => tu.id === testUserId).access_token;
-
-  const result = await FB.api(testUserId, {
-    fields: 'id, name, email',
-  });
-
-  return {
-    id: result.id,
-    name: result.name,
-    email: result.email,
-    accessToken,
-  };
+function mockFacebookUserEndpoint(testUser) {
+  mockFacebookEndpoint(testUser.id, { fields: 'id, name, email' }, testUser);
 }
 
 describe('The access token validator', async () => {
@@ -35,20 +23,46 @@ describe('The access token validator', async () => {
     const validator = accessTokenValidator('Facebook');
 
     it('should return the user data when the token is valid', async () => {
-      const testUser = await getFacebookTestUser({ grantedEmailPermission: true });
+      const validAccessToken = 'fmapjgajg09ir0fkpfj30';
 
-      const result = await validator.validateToken(testUser.accessToken);
+      const testUser = {
+        id: '104955927023899',
+        name: 'Test User',
+        email: 'testuser@example.com',
+      };
 
-      expect(result).toBeDefined();
-      expect(result).not.toBeNull();
-      expect(result.id).toEqual(testUser.id);
-      expect(result.name).toEqual(testUser.name);
-      expect(result.email).toEqual(testUser.email);
+      const replyBody = {
+        data: {
+          is_valid: true,
+          scopes: ['email', 'public_profile'],
+          user_id: testUser.id,
+        },
+      };
+
+      mockFacebookDebugTokenEndpoint(validAccessToken, replyBody);
+      mockFacebookUserEndpoint(testUser);
+
+      const result = await validator.validateToken(validAccessToken);
+
+      expect(result).toEqual(testUser);
     });
 
     it('should throw an error when the access token has expired', async () => {
-      const expiredToken =
-        'EAAFd30lIROIBANtHtZBeqLshF8sUXP64LFeXpCPLqjpG9CTAisFpLcENovRsaDmbFBwjPD53JNAPSZAkKzEze65t08J09FvmenexijIM4To1uDVGZCJiSKi4t8mBQyBRLZAhQMlYlkUZBZBtQyETxWmMMjtSc9872wZACJG1WWicufZAyXVeGx6z2ZCeFy9ovFK1L8fZCsUtJeBtRRllcK7ta2A5gvomhTAoBNqb40jkHsmzcFWCHpcuu0';
+      const expiredToken = 'EAAFd30lIROIBANtHtZBeqLshF8sUXP64LFeXpCPLqjpG9CTAisFpLcE';
+
+      const replyBody = {
+        data: {
+          error: {
+            code: 190,
+            message: 'Any error message',
+            subcode: 464,
+          },
+          expires_at: 1522724400,
+          is_valid: false,
+        },
+      };
+
+      mockFacebookDebugTokenEndpoint(expiredToken, replyBody);
 
       const resultPromise = validator.validateToken(expiredToken);
 
@@ -58,15 +72,34 @@ describe('The access token validator', async () => {
     it('should throw an error when the token is not valid', async () => {
       const invalidToken = 'jgapojgpagkjpagkjpaj';
 
+      const replyBody = {
+        data: {
+          error: { code: 190, message: 'Invalid OAuth access token.' },
+          is_valid: false,
+        },
+      };
+
+      mockFacebookDebugTokenEndpoint(invalidToken, replyBody);
+
       const resultPromise = validator.validateToken(invalidToken);
 
       return expect(resultPromise).rejects.toThrowError(err.INVALID_ACCESS_TOKEN);
     });
 
     it('should throw an error when the user does not grant the email permission', async () => {
-      const testUser = await getFacebookTestUser({ grantedEmailPermission: false });
+      const accessToken = 'EAAFd30lIROIBANtHtZBeqLshF8sUXP64LFeXpCPLqjpG9CTAisFpLcE';
 
-      const resultPromise = validator.validateToken(testUser.accessToken);
+      const replyBody = {
+        data: {
+          is_valid: true,
+          scopes: ['public_profile'],
+          user_id: '4646464646',
+        },
+      };
+
+      mockFacebookDebugTokenEndpoint(accessToken, replyBody);
+
+      const resultPromise = validator.validateToken(accessToken);
 
       return expect(resultPromise).rejects.toThrowError(err.EMAIL_PERMISSION_NOT_GRANTED);
     });
