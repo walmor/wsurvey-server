@@ -30,6 +30,9 @@ const schema = {
     },
     apiVersion: process.env.FACEBOOK_API_VERSION || 'v2.12',
   },
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+  },
 };
 
 // Default configurations
