@@ -1,6 +1,6 @@
-import authService from '../../services/auth-service';
-import * as err from '../../services/errors/error-constants';
-import '../utils/custom-expects';
+import authService from '../../../services/auth/auth-service';
+import * as err from '../../../services/errors/error-constants';
+import '../../utils/custom-expects';
 
 function getRandomUser() {
   return {
@@ -11,27 +11,39 @@ function getRandomUser() {
   };
 }
 
-function getAuthService(userRepository, accessTokenValidator) {
-  return authService({
-    userRepository,
-    accessTokenValidator,
-  });
+function getAuthService(userRepository, tokenValidators) {
+  return authService(
+    {
+      userRepository,
+    },
+    tokenValidators,
+  );
 }
 
 function expectedJwtPayload(user) {
   return { user: { id: user.id, name: user.name } };
 }
 
-function getTokenValidatorStub(user, id) {
+function getTokenValidatorsStub(name, user, id) {
   return {
-    validateToken() {
-      return {
-        id,
-        name: user.name,
-        email: user.email,
-      };
+    [name]: {
+      async validateToken() {
+        return {
+          id,
+          name: user.name,
+          email: user.email,
+        };
+      },
     },
   };
+}
+
+function getFacebookTokenValidatorStub(user, id) {
+  return getTokenValidatorsStub('facebookTokenValidator', user, id);
+}
+
+function getGoogleTokenValidatorStub(user, id) {
+  return getTokenValidatorsStub('googleTokenValidator', user, id);
 }
 
 describe('The authService', async () => {
@@ -112,13 +124,15 @@ describe('The authService', async () => {
       const anyValidFacebookId = '64646194964';
 
       it('should throw an error if the token is invalid', async () => {
-        const tokenValidator = {
-          validateToken() {
-            throw err.INVALID_ACCESS_TOKEN;
+        const accessTokenValidators = {
+          facebookTokenValidator: {
+            async validateToken() {
+              throw err.INVALID_ACCESS_TOKEN;
+            },
           },
         };
 
-        const service = getAuthService(null, tokenValidator);
+        const service = getAuthService(null, accessTokenValidators);
 
         const signinPromise = service.signinWithFacebook('any-invalid-token');
 
@@ -128,7 +142,7 @@ describe('The authService', async () => {
       it('should create a new user if it does not exist', async () => {
         const user = getRandomUser();
 
-        const tokenValidatorStub = getTokenValidatorStub(user, anyValidFacebookId);
+        const tokenValidatorStub = getFacebookTokenValidatorStub(user, anyValidFacebookId);
 
         const userRepoStub = {
           findByEmail() {
@@ -153,7 +167,7 @@ describe('The authService', async () => {
         const user = getRandomUser();
         let updatedUser = null;
 
-        const tokenValidatorStub = getTokenValidatorStub(user, anyValidFacebookId);
+        const tokenValidatorStub = getFacebookTokenValidatorStub(user, anyValidFacebookId);
 
         const userRepoStub = {
           findByEmail() {
@@ -179,7 +193,7 @@ describe('The authService', async () => {
       it('should just sign the user in if it has already signed up with Facebook', async () => {
         const user = getRandomUser();
 
-        const tokenValidatorStub = getTokenValidatorStub(user, anyValidFacebookId);
+        const tokenValidatorStub = getFacebookTokenValidatorStub(user, anyValidFacebookId);
 
         const userRepoStub = {
           findByFacebookId() {
@@ -200,13 +214,15 @@ describe('The authService', async () => {
       const anyValidGoogleId = '131643164697';
 
       it('should throw an error if the token is invalid', async () => {
-        const tokenValidator = {
-          validateToken() {
-            throw err.INVALID_ACCESS_TOKEN;
+        const tokenValidators = {
+          googleTokenValidator: {
+            async validateToken() {
+              throw err.INVALID_ACCESS_TOKEN;
+            },
           },
         };
 
-        const service = getAuthService(null, tokenValidator);
+        const service = getAuthService(null, tokenValidators);
 
         const signinPromise = service.signinWithGoogle('any-invalid-token');
 
@@ -216,7 +232,7 @@ describe('The authService', async () => {
       it('should create a new user if it does not exist', async () => {
         const user = getRandomUser();
 
-        const tokenValidatorStub = getTokenValidatorStub(user, anyValidGoogleId);
+        const tokenValidatorStub = getGoogleTokenValidatorStub(user, anyValidGoogleId);
 
         const userRepoStub = {
           findByEmail() {
@@ -241,7 +257,7 @@ describe('The authService', async () => {
         const user = getRandomUser();
         let updatedUser = null;
 
-        const tokenValidatorStub = getTokenValidatorStub(user, anyValidGoogleId);
+        const tokenValidatorStub = getGoogleTokenValidatorStub(user, anyValidGoogleId);
 
         const userRepoStub = {
           findByEmail() {
@@ -267,7 +283,7 @@ describe('The authService', async () => {
       it('should just sign the user in if it has already signed up with Google', async () => {
         const user = getRandomUser();
 
-        const tokenValidatorStub = getTokenValidatorStub(user, anyValidGoogleId);
+        const tokenValidatorStub = getGoogleTokenValidatorStub(user, anyValidGoogleId);
 
         const userRepoStub = {
           findByGoogleId() {

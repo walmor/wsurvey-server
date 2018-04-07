@@ -6,7 +6,7 @@ class CustomError extends Error {
 }
 
 function ce(code, message) {
-  return new CustomError(message, code);
+  return new CustomError(code, message);
 }
 
 export { CustomError as default, ce };
