@@ -26,7 +26,9 @@ const userSchema = new Schema({
 userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
     const saltRounds = 9;
-    this.password = await bcrypt.hash(this.password, saltRounds);
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, saltRounds);
+    }
   }
 
   next();
@@ -34,6 +36,9 @@ userSchema.pre('save', async function (next) {
 
 const userMethods = {
   async comparePassword(password) {
+    if (!this.password) {
+      return false;
+    }
     return bcrypt.compare(password, this.password);
   },
 };

@@ -33,5 +33,13 @@ describe('The User instance', async () => {
 
       expect(result).toBe(false);
     });
+
+    it('should return false if the user does not have a password', async () => {
+      const user = await saveUser({ password: undefined });
+
+      const result = await user.comparePassword('any-password');
+
+      expect(result).toBe(false);
+    });
   });
 });
