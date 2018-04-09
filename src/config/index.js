@@ -29,6 +29,7 @@ const schema = {
       return `${this.appId}|${this.appSecret}`;
     },
     apiVersion: process.env.FACEBOOK_API_VERSION || 'v2.12',
+    testUserId: process.env.FACEBOOK_TEST_USER_ID,
   },
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID,

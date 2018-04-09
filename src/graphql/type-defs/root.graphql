@@ -1,0 +1,12 @@
+type Query {
+  auth: AuthQuery
+}
+
+type Mutation {
+  auth: AuthMutation
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}

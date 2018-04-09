@@ -14,7 +14,7 @@ export default function applyMethods(schema, methods) {
       copyMethods(ret);
 
       if (ret._id) {
-        ret.id = ret._id;
+        ret.id = ret._id.toString();
         delete ret._id;
       }
 

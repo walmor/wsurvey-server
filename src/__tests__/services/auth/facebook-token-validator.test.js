@@ -4,7 +4,7 @@ import * as err from '../../../services/errors/error-constants';
 import facebookTokeValidator from '../../../services/auth/facebook-token-validator';
 
 function mockEndpoint(endpoint, query, body) {
-  nock('https://graph.facebook.com')
+  nock('https://graph.facebook.com', { allowUnmocked: true })
     .get(`/${config.facebook.apiVersion}/${endpoint}`)
     .query(Object.assign({}, query, { access_token: /.*/ }))
     .reply(200, body);

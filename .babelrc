@@ -9,6 +9,7 @@
       }
     ]
   ],
+  "plugins": ["babel-plugin-inline-import"],
   "env": {
     "test": {
       "retainLines": true
