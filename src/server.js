@@ -1,11 +1,14 @@
-import express from 'express';
+import startDatabase from './database';
 import config from './config';
-import graphqlSetup from './graphql/setup';
+import app from './app';
 
-export default async function startServer() {
-  const app = express();
+/* eslint-disable no-console */
 
-  graphqlSetup(app);
-
-  return app.listen(config.app.port);
-}
+startDatabase()
+  .then(() => app.listen(config.app.port))
+  .then((srv) => {
+    console.log(`Server listening on port ${srv.address().port}.`);
+  })
+  .catch((err) => {
+    console.error(`Error starting server: ${err}`);
+  });

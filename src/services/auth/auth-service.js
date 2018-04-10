@@ -92,5 +92,9 @@ export default function authService({ userRepository }, tokenValidators) {
         socialNetworkIdProp: 'googleId',
       });
     },
+
+    async findUserById(id) {
+      return userRepository.findById(id);
+    },
   };
 }

@@ -19,7 +19,7 @@ const authController = {
     return authService.signinWithGoogle(idToken);
   },
 
-  currentUser(parent, args, context) {
+  currentUser(args, context) {
     return context.user || null;
   },
 };

@@ -1,24 +1,21 @@
 import supertest from 'supertest';
 import FB from 'fb';
-import startServer from '../../server';
+import app from '../../app';
 import * as mongodbInMemory from '../utils/mongodb-in-memory';
 import * as err from '../../services/errors/error-constants';
 import userRepository from '../../repositories/mongoose/user-repository';
 import config from '../../config';
 import '../utils/custom-expects';
 
-let server;
 let request;
 
 beforeAll(async () => {
   await mongodbInMemory.init();
-  server = await startServer();
-  request = supertest(server);
+  request = supertest(app);
 });
 
 afterAll(async () => {
   await mongodbInMemory.stop();
-  server.close();
 });
 
 beforeEach(async () => {
