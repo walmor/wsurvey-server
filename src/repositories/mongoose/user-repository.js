@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import User from './models/user';
 
 async function findOneToObject(conditions) {
@@ -21,6 +22,20 @@ const userRepository = {
     doc.set(user);
     await doc.save();
     return Object.assign(user, doc.toObject());
+  },
+
+  async findById(id) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return null;
+    }
+
+    const doc = await User.findOne({ _id: id });
+
+    if (doc) {
+      return doc.toObject();
+    }
+
+    return null;
   },
 
   async findByEmail(email) {

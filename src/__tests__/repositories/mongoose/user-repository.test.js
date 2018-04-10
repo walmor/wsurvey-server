@@ -134,6 +134,32 @@ describe('The user repository', async () => {
     });
   });
 
+  describe('when searching by id', async () => {
+    it('should find an existing user', async () => {
+      const user = await saveUser();
+
+      const foundUser = await userRepository.findById(user.id);
+
+      expect(foundUser.id).toEqual(user.id);
+    });
+
+    it('should return null when there is no matches', async () => {
+      const unexistentId = '53cb6b9b4f4ddef1ad47f943';
+
+      const foundUser = await userRepository.findById(unexistentId);
+
+      expect(foundUser).toBeNull();
+    });
+
+    it('should return null when the given id is invalid', async () => {
+      const invalidId = 'abc';
+
+      const foundUser = await userRepository.findById(invalidId);
+
+      expect(foundUser).toBeNull();
+    });
+  });
+
   describe('when searching by email', async () => {
     it('should find an existing user', async () => {
       const validEmail = 'john@example.com';
@@ -142,7 +168,7 @@ describe('The user repository', async () => {
 
       const foundUser = await userRepository.findByEmail(validEmail);
 
-      expect(foundUser._id).toEqual(user._id);
+      expect(foundUser.id).toEqual(user.id);
     });
 
     it('should return null when there is no matches', async () => {
@@ -251,6 +277,7 @@ describe('The user repository', async () => {
         methodsToTest: {
           create: [userToCreate],
           update: [userToUpdate],
+          findById: [user.id],
           findByEmail: [user.email],
           findByGoogleId: [user.googleId],
           findByFacebookId: [user.facebookId],
