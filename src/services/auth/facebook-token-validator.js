@@ -15,7 +15,7 @@ const facebookTokenValidator = {
         input_token: accessToken,
       });
 
-      if (!response || !response.data) {
+      if (!response.data) {
         throw err.INVALID_ACCESS_TOKEN;
       }
 
@@ -30,10 +30,6 @@ const facebookTokenValidator = {
       response = await FB.api(response.data.user_id, {
         fields: 'id, name, email',
       });
-
-      if (!response || response.error) {
-        throw err.INVALID_ACCESS_TOKEN;
-      }
 
       return {
         id: response.id,

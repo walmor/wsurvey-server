@@ -4,10 +4,12 @@ import * as err from '../../../services/errors/error-constants';
 import facebookTokeValidator from '../../../services/auth/facebook-token-validator';
 
 function mockEndpoint(endpoint, query, body) {
+  const httpCode = body ? 200 : 500;
+
   nock('https://graph.facebook.com', { allowUnmocked: true })
     .get(`/${config.facebook.apiVersion}/${endpoint}`)
     .query(Object.assign({}, query, { access_token: /.*/ }))
-    .reply(200, body);
+    .reply(httpCode, body);
 }
 
 function mockDebugTokenEndpoint(accessToken, body) {
@@ -44,6 +46,59 @@ describe('The Facebook token validator', async () => {
     const result = await validator.validateToken(validAccessToken);
 
     expect(result).toEqual(testUser);
+  });
+
+  it('should throw an error when getting a http error', async () => {
+    const anyToken = 'any-token';
+
+    const replyBody = null;
+
+    mockDebugTokenEndpoint(anyToken, replyBody);
+
+    const resultPromise = validator.validateToken(anyToken);
+
+    return expect(resultPromise).rejects.toThrowError(err.INVALID_ACCESS_TOKEN);
+  });
+
+  it('should throw an error when the debug token endpoint response is empty', async () => {
+    const anyToken = 'any-token';
+
+    const replyBody = {
+      data: null,
+    };
+
+    mockDebugTokenEndpoint(anyToken, replyBody);
+
+    const resultPromise = validator.validateToken(anyToken);
+
+    return expect(resultPromise).rejects.toThrowError(err.INVALID_ACCESS_TOKEN);
+  });
+
+  it('should throw an error when the user endpoint response contains an error', async () => {
+    const anyToken = 'any-token';
+
+    const replyBody = {
+      data: {
+        is_valid: true,
+        scopes: ['email', 'public_profile'],
+        user_id: '13164949',
+      },
+    };
+
+    const userEndpointResponse = {
+      id: '13164949',
+      error: {
+        code: 100,
+        message: 'any-error-message',
+      },
+    };
+
+    mockDebugTokenEndpoint(anyToken, replyBody);
+    mockUserEndpoint(userEndpointResponse);
+
+    const resultPromise = validator.validateToken(anyToken);
+
+    return expect(resultPromise).rejects.toThrowError(err.INVALID_ACCESS_TOKEN);
   });
 
   it('should throw an error when the access token has expired', async () => {

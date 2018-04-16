@@ -15,6 +15,17 @@ function mockTokenInfoEndpoint(idToken, body) {
 describe('The Google token validator', async () => {
   const validator = googleTokeValidator;
 
+  it('should return false when the token is null or empty', async () => {
+    const emptyIdToken = '';
+    const result1 = await validator.validateToken(emptyIdToken);
+
+    const nullIdToken = '';
+    const result2 = await validator.validateToken(nullIdToken);
+
+    expect(result1).toEqual(false);
+    expect(result2).toEqual(false);
+  });
+
   it('should return the user data when the token is valid', async () => {
     const validIdToken = 'fmapjgajg09ir0fkpfj30';
 

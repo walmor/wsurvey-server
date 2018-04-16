@@ -105,6 +105,16 @@ describe('The user repository', async () => {
   });
 
   describe('when updating an user', async () => {
+    it('should throw an error when the user id does not exist', async () => {
+      const user = getRandomUser({ name: null });
+      const unexistentId = '53cb6b9b4f4ddef1ad47f943';
+      user.id = unexistentId;
+
+      const promise = userRepository.update(unexistentId);
+
+      return expect(promise).rejects.toThrowError();
+    });
+
     it('should encrypt the password when it was altered', async () => {
       const user = getRandomUser();
       await userRepository.create(user);
