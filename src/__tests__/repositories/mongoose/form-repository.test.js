@@ -1,6 +1,6 @@
 import * as mongodbInMemory from '../../utils/mongodb-in-memory';
 import { saveUser } from '../../utils/user-factory';
-// import { expectToNotReturnMongooseModels } from '../../utils/custom-expects';
+import { expectToNotReturnMongooseModels } from '../../utils/custom-expects';
 import formRepository from '../../../repositories/mongoose/form-repository';
 import '../../../repositories/mongoose/models/question-kinds';
 
@@ -278,6 +278,22 @@ describe('The form repository', async () => {
       expect(updatedForm.questions[0]).toMatchObject(questionTwo);
     });
 
+    it('should remove all the questions it is null', async () => {
+      const form = await getBareForm();
+      const questionOne = getBaseQuestion('Paragraph');
+      const questionTwo = getBaseQuestion('ShortAnswer');
+
+      form.questions = [questionOne, questionTwo];
+
+      const savedForm = await formRepository.create(form);
+
+      savedForm.questions = null;
+
+      const updatedForm = await formRepository.update(savedForm);
+
+      expect(updatedForm.questions).toBeNull();
+    });
+
     it('should not update the createdAt property', async () => {
       const form = await getBareForm();
 
@@ -289,6 +305,22 @@ describe('The form repository', async () => {
       const updatedForm = await formRepository.update(savedForm);
 
       expect(updatedForm.createdAt).toEqual(createdAt);
+    });
+
+    it('should not remove the questions if it is undefined', async () => {
+      const form = await getBareForm();
+      const questionOne = getBaseQuestion('Paragraph');
+      const questionTwo = getBaseQuestion('ShortAnswer');
+
+      form.questions = [questionOne, questionTwo];
+
+      const savedForm = await formRepository.create(form);
+
+      delete savedForm.questions;
+
+      const updatedForm = await formRepository.update(savedForm);
+
+      expect(updatedForm.questions).toHaveLength(2);
     });
   });
 
@@ -454,6 +486,69 @@ describe('The form repository', async () => {
 
       expect(result.totalCount).toEqual(totalCount);
       expect(result.forms).toHaveLength(pageSize);
+    });
+
+    it('should not return deleted forms', async () => {
+      const user = await saveUser();
+      const form1 = await saveBareForm(user, { deleted: true });
+      const form2 = await saveBareForm(user, { deleted: true });
+
+      await saveForms(user, 5);
+
+      const result = await formRepository.find({
+        page: 0,
+        pageSize: 10,
+        userId: user.id,
+      });
+
+      expect(result.forms).toHaveLength(5);
+      expect(result.forms).not.toContainEqual(form1);
+      expect(result.forms).not.toContainEqual(form2);
+    });
+
+    it('should not return other users forms', async () => {
+      const user1 = await saveUser({ email: 'peter@example.com' });
+      const user2 = await saveUser({ email: 'jonh@example.com' });
+
+      const user1Form = await saveBareForm(user1);
+      const user2form = await saveBareForm(user2);
+
+      const result = await formRepository.find({
+        page: 0,
+        pageSize: 10,
+        userId: user1.id,
+      });
+
+      expect(result.forms).toHaveLength(1);
+      expect(result.forms).toContainEqual(user1Form);
+      expect(result.forms).not.toContainEqual(user2form);
+    });
+  });
+
+  describe('when returning objects', async () => {
+    it('should not return mongoose models', async () => {
+      const user = await saveUser();
+      const formToCreate = await getBareForm(user);
+      const formToUpdate = await saveBareForm(user);
+      const findOpts = {
+        page: 0,
+        pageSize: 10,
+        userId: user.id,
+      };
+
+      formToCreate.question = [getBaseQuestion('ShortAnswer')];
+
+      const methods = {
+        methodsToTest: {
+          create: [formToCreate],
+          update: [formToUpdate],
+          findById: [formToUpdate.id],
+          find: [findOpts],
+        },
+        methodsToIgnore: ['delete'],
+      };
+
+      await expectToNotReturnMongooseModels(formRepository, methods);
     });
   });
 });

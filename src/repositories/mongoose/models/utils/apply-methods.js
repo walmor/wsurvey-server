@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 export default function applyMethods(schema, methods) {
   const copyMethods = (obj) => {
     Object.keys(methods).forEach((key) => {
@@ -17,6 +19,12 @@ export default function applyMethods(schema, methods) {
         ret.id = ret._id.toString();
         delete ret._id;
       }
+
+      Object.keys(ret).forEach((key) => {
+        if (ret[key] instanceof Types.ObjectId) {
+          ret[key] = ret[key].toString();
+        }
+      });
 
       return ret;
     },

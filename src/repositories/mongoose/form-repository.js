@@ -17,11 +17,13 @@ const formRepository = {
 
     const formClone = cloneDeep(form);
 
-    formClone.questions.forEach((q) => {
-      if (q.id) {
-        q._id = q.id;
-      }
-    });
+    if (formClone.questions) {
+      formClone.questions.forEach((q) => {
+        if (q.id) {
+          q._id = q.id;
+        }
+      });
+    }
 
     doc.set(formClone);
     await doc.save();
@@ -59,12 +61,15 @@ const formRepository = {
 
     const skip = page * pageSize;
 
-    const userFilter = { userId };
-    let conditions = userFilter;
+    const baseFilter = {
+      $and: [{ userId }, { $or: [{ deleted: false }, { deleted: { $exists: false } }] }],
+    };
+
+    let conditions = baseFilter;
 
     if (search) {
       const regex = new RegExp(search, 'i');
-      conditions = { $and: [userFilter, { $or: [{ title: regex }, { description: regex }] }] };
+      conditions = { $and: [baseFilter, { $or: [{ title: regex }, { description: regex }] }] };
     }
 
     const totalCount = await Form.count(conditions);
