@@ -87,8 +87,14 @@ describe('The form service', async () => {
 
     it('should throw an authorization error if the form does not belong to the user', async () => {
       const user = { id: '653214' };
-      const form = { id: '6497955', userId: '123456' };
-      const service = getFormService();
+      const form = { id: '6497955' };
+      const userRepoStub = {
+        async findById() {
+          return { ...form, ...{ userId: '1313' } };
+        },
+      };
+
+      const service = getFormService(userRepoStub);
 
       const promise = service.update(form, user);
 
@@ -97,10 +103,13 @@ describe('The form service', async () => {
 
     it('should update a form if the access is granted', async () => {
       const user = { id: '46464646' };
-      const form = { id: '54646', userId: '46464646', title: 'Updated title' };
+      const form = { id: '54646', title: 'Updated title' };
       const userRepoStub = {
         async update() {
           return form;
+        },
+        async findById() {
+          return { ...form, ...{ userId: user.id } };
         },
       };
 
@@ -193,6 +202,22 @@ describe('The form service', async () => {
       const foundForm = await service.findById(form.id, user);
 
       expect(foundForm).toBe(form);
+    });
+
+    it('should return null if no form was found', async () => {
+      const user = { id: '653214' };
+      const anyInvalidFormId = '144646';
+      const userRepoStub = {
+        async findById() {
+          return null;
+        },
+      };
+
+      const service = getFormService(userRepoStub);
+
+      const foundForm = await service.findById(anyInvalidFormId, user);
+
+      return expect(foundForm).toBeNull();
     });
   });
 

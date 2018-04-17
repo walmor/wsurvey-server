@@ -23,7 +23,9 @@ export default function formService({ formRepository }) {
         throw err.INVALID_OBJECT_ID;
       }
 
-      if (form.userId !== user.id) {
+      const currentForm = await formRepository.findById(form.id);
+
+      if (currentForm.userId !== user.id) {
         throw err.NOT_AUTHORIZED;
       }
 
@@ -50,6 +52,8 @@ export default function formService({ formRepository }) {
       ensureUserSignedIn(user);
 
       const form = await formRepository.findById(formId);
+
+      if (!form) return null;
 
       if (form.userId !== user.id) {
         throw err.NOT_AUTHORIZED;
