@@ -1,9 +1,15 @@
+scalar JSON
+
+scalar DateTime
+
 type Query {
   auth: AuthQuery
+  forms: FormsQuery
 }
 
 type Mutation {
   auth: AuthMutation
+  forms: FormsMutation
 }
 
 schema {

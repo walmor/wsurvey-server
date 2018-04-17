@@ -1,0 +1,17 @@
+type Question {
+  id: ID!
+  kind: String!
+  title: String!
+  description: String
+  required: Boolean
+  options: JSON
+}
+
+input QuestionInput {
+  id: ID
+  title: String!
+  kind: String!
+  description: String
+  required: Boolean
+  options: JSON
+}

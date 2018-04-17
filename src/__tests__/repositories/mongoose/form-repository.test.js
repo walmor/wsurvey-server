@@ -1,5 +1,6 @@
 import * as mongodbInMemory from '../../utils/mongodb-in-memory';
 import { saveUser } from '../../utils/user-factory';
+import { getBareForm, getBaseQuestion, getFormWithQuestion, saveBareForm, saveForms } from '../../utils/form-factory';
 import { expectToNotReturnMongooseModels } from '../../utils/custom-expects';
 import formRepository from '../../../repositories/mongoose/form-repository';
 import '../../../repositories/mongoose/models/question-kinds';
@@ -15,65 +16,6 @@ afterAll(async () => {
 beforeEach(async () => {
   await mongodbInMemory.clearDatabase();
 });
-
-async function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function saveBareForm(user, props) {
-  const form = await getBareForm(user, props);
-  return formRepository.create(form);
-}
-
-async function saveForms(user, quantity) {
-  const forms = [];
-
-  /* eslint-disable no-await-in-loop */
-  for (let i = 0; i < quantity; i++) {
-    // just a small delay to have slightly
-    // different creation dates and test sort.
-    await delay(20);
-    forms.push(await saveBareForm(user));
-  }
-
-  return forms;
-}
-
-async function getBareForm(user, props) {
-  let usr = user;
-  if (!usr) {
-    usr = await saveUser();
-  }
-
-  return Object.assign(
-    {
-      title: 'test form',
-      description: 'just a test form',
-      userId: usr.id,
-    },
-    props,
-  );
-}
-
-function getBaseQuestion(kind, props) {
-  return Object.assign(
-    {
-      kind,
-      title: 'some question',
-      description: 'some description',
-    },
-    props,
-  );
-}
-
-async function getFormWithQuestion(kind, props) {
-  const form = await getBareForm();
-  const question = getBaseQuestion(kind, props);
-
-  form.questions = [question];
-
-  return { form, question };
-}
 
 function getQuestionTests() {
   const qt = (name, props) => ({ name, props });

@@ -1,0 +1,16 @@
+type Form {
+  id: ID!
+  title: String!
+  description: String
+  enabled: Boolean
+  createdAt: DateTime
+  questions: [Question]
+}
+
+input FormInput {
+  id: ID
+  title: String!
+  description: String
+  enabled: Boolean
+  questions: [QuestionInput]
+}

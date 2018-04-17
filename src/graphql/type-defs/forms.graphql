@@ -1,0 +1,26 @@
+type FormsQuery {
+  find(input: FormsFindInput!): FormConnection
+  findById(formId: ID!): Form
+}
+
+type FormsMutation {
+  create(form: FormInput!): Form
+  update(form: FormInput!): Form
+  delete(formId: ID!): DeleteFormResult
+}
+
+input FormsFindInput {
+  page: Int!
+  pageSize: Int!
+  search: String
+}
+
+type FormConnection {
+  totalCount: Int!
+  forms: [Form]
+}
+
+type DeleteFormResult {
+  formId: ID
+  success: Boolean
+}

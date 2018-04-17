@@ -9,7 +9,7 @@
       }
     ]
   ],
-  "plugins": ["babel-plugin-inline-import"],
+  "plugins": ["babel-plugin-inline-import", "transform-object-rest-spread"],
   "env": {
     "test": {
       "retainLines": true
