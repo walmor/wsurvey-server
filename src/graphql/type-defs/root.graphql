@@ -4,6 +4,7 @@ scalar DateTime
 
 type Query {
   viewer: User
+  isEmailAvailable(email: String!): Boolean
   form(formId: ID!): Form
   forms(input: SearchFormInput!): FormConnection
 }

@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { isEmail } from 'validator';
 import * as err from './../errors/error-constants';
 import config from '../../config';
 
@@ -95,6 +96,14 @@ export default function authService({ userRepository }, tokenValidators) {
 
     async findUserById(id) {
       return userRepository.findById(id);
+    },
+
+    async isEmailAvailable(email) {
+      if (!isEmail(email)) {
+        throw err.INVALID_EMAIL_ADDRESS;
+      }
+
+      return userRepository.isEmailAvailable(email);
     },
   };
 }

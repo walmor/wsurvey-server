@@ -272,6 +272,26 @@ describe('The user repository', async () => {
     });
   });
 
+  describe('when checking if an email is available', async () => {
+    it('should return true is there is no users with the given email', async () => {
+      const availableEmail = 'any@example.com';
+
+      const isAvailable = await userRepository.isEmailAvailable(availableEmail);
+
+      expect(isAvailable).toBe(true);
+    });
+
+    it('should return false if an user with the given email exists', async () => {
+      const unavailableEmail = 'peter@example.com';
+
+      await saveUser({ email: unavailableEmail });
+
+      const isAvailable = await userRepository.isEmailAvailable(unavailableEmail);
+
+      expect(isAvailable).toBe(false);
+    });
+  });
+
   describe('when returning objects', async () => {
     it('should not return mongoose models', async () => {
       const password = 'password';
@@ -293,6 +313,7 @@ describe('The user repository', async () => {
           findByFacebookId: [user.facebookId],
           findByEmailAndPassword: [user.email, password],
         },
+        methodsToIgnore: ['isEmailAvailable'],
       };
 
       await expectToNotReturnMongooseModels(userRepository, methods);

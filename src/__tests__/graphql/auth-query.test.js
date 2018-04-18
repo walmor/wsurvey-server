@@ -34,6 +34,21 @@ function getCurrentUserQuery() {
   };
 }
 
+function sendIsEmailAvailableQuery(email) {
+  const query = {
+    query: `
+        query {
+          isEmailAvailable(email: "${email}")
+        }
+      `,
+  };
+
+  return request
+    .post('/graphql')
+    .set('Accept', 'application/json')
+    .send(query);
+}
+
 async function sendCurrentUserQuery(token) {
   const query = getCurrentUserQuery();
   const authToken = token ? `Bearer ${token}` : null;
@@ -82,5 +97,45 @@ describe('The auth query', async () => {
 
     expect(viewer.email).toEqual(user.email);
     expect(viewer.name).toEqual(user.name);
+  });
+
+  describe('when checking if an email is available', async () => {
+    it('should return true if there is no user with the given email', async () => {
+      const anyAvailableEmail = 'any@example.com';
+
+      const res = await sendIsEmailAvailableQuery(anyAvailableEmail);
+
+      const isAvailable = res.body.data.isEmailAvailable;
+
+      expect(isAvailable).toBe(true);
+    });
+
+    it('should return false if an user with the given email exists', async () => {
+      const user = {
+        name: 'Peter',
+        email: 'peter@example.com',
+        password: '132146',
+      };
+
+      const { authService } = services;
+      await authService.signup(user.name, user.email, user.password);
+
+      const res = await sendIsEmailAvailableQuery(user.email);
+
+      const isAvailable = res.body.data.isEmailAvailable;
+
+      expect(isAvailable).toBe(false);
+    });
+
+    it('should return an error when the given email is invalid', async () => {
+      const anyInvalidEmail = 'any-invalid-email';
+
+      const res = await sendIsEmailAvailableQuery(anyInvalidEmail);
+
+      const { errors } = res.body;
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].code).toEqual(err.INVALID_EMAIL_ADDRESS.code);
+    });
   });
 });

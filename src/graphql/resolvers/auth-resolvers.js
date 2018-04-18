@@ -2,6 +2,10 @@ const authQueryResolver = {
   viewer(_, __, context) {
     return context.user || null;
   },
+  async isEmailAvailable(_, { email }, { services }) {
+    const { authService } = services;
+    return authService.isEmailAvailable(email);
+  },
 };
 
 const authMutationResolver = {

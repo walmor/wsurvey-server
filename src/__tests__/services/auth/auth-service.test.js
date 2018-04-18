@@ -299,4 +299,46 @@ describe('The authService', async () => {
       });
     });
   });
+
+  describe('when checking if an email is available', async () => {
+    it('should throw an erro if the mail is invalid', async () => {
+      const invalidEmail = 'any-invalid-email';
+
+      const service = getAuthService();
+
+      const promise = service.isEmailAvailable(invalidEmail);
+
+      return expect(promise).rejects.toThrowError(err.INVALID_EMAIL_ADDRESS);
+    });
+
+    it('should return true is there is no users with the given email', async () => {
+      const availableEmail = 'any@example.com';
+      const userRepoStub = {
+        async isEmailAvailable() {
+          return true;
+        },
+      };
+
+      const service = getAuthService(userRepoStub);
+
+      const isAvailable = await service.isEmailAvailable(availableEmail);
+
+      expect(isAvailable).toBe(true);
+    });
+
+    it('should return false if an user with the given email exists', async () => {
+      const unavailableEmail = 'any@example.com';
+      const userRepoStub = {
+        async isEmailAvailable() {
+          return false;
+        },
+      };
+
+      const service = getAuthService(userRepoStub);
+
+      const isAvailable = await service.isEmailAvailable(unavailableEmail);
+
+      expect(isAvailable).toBe(false);
+    });
+  });
 });

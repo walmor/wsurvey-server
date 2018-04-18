@@ -59,6 +59,11 @@ const userRepository = {
   async findByGoogleId(googleId) {
     return findOneToObject({ googleId });
   },
+
+  async isEmailAvailable(email) {
+    const count = await User.count({ email });
+    return count === 0;
+  },
 };
 
 export default userRepository;
