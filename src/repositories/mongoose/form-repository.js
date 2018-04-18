@@ -76,7 +76,7 @@ const formRepository = {
     const formModels = await Form.find(conditions, null, { skip, limit: pageSize, sort: { createdAt: -1 } });
     const forms = formModels.map(fm => fm.toObject());
 
-    return { totalCount, forms };
+    return { totalCount, nodes: forms };
   },
 };
 

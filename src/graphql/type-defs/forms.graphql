@@ -1,26 +1,15 @@
-type FormsQuery {
-  find(input: FormsFindInput!): FormConnection
-  findById(formId: ID!): Form
+type FormConnection {
+  totalCount: Int!
+  nodes: [Form]
 }
 
-type FormsMutation {
-  create(form: FormInput!): Form
-  update(form: FormInput!): Form
-  delete(formId: ID!): DeleteFormResult
-}
-
-input FormsFindInput {
+input SearchFormInput {
   page: Int!
   pageSize: Int!
   search: String
 }
 
-type FormConnection {
-  totalCount: Int!
-  forms: [Form]
-}
-
-type DeleteFormResult {
+type DeleteFormPayload {
   formId: ID
   success: Boolean
 }

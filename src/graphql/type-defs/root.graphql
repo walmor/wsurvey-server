@@ -3,13 +3,19 @@ scalar JSON
 scalar DateTime
 
 type Query {
-  auth: AuthQuery
-  forms: FormsQuery
+  viewer: User
+  form(formId: ID!): Form
+  forms(input: SearchFormInput!): FormConnection
 }
 
 type Mutation {
-  auth: AuthMutation
-  forms: FormsMutation
+  signup(name: String!, email: String!, password: String!): String
+  signin(email: String!, password: String!): String
+  signinWithFacebook(accessToken: String!): String
+  signinWithGoogle(idToken: String!): String
+  createForm(form: FormInput!): Form
+  updateForm(form: FormInput!): Form
+  deleteForm(formId: ID!): DeleteFormPayload
 }
 
 schema {

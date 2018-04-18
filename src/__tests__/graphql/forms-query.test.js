@@ -49,24 +49,22 @@ describe('The forms query', async () => {
       return {
         query: `
         query {
-          forms {
-            find(input: {
-              page: 0
-              pageSize: 10              
-            }) {
-              totalCount
-              forms {
+          forms(input: {
+            page: 0
+            pageSize: 10              
+          }) {
+            totalCount
+            nodes {
+              id
+              title
+              description
+              enabled
+              createdAt
+              questions {
                 id
                 title
                 description
-                enabled
-                createdAt
-                questions {
-                  id
-                  title
-                  description
-                  required                  
-                }
+                required                  
               }
             }
           }
@@ -94,7 +92,7 @@ describe('The forms query', async () => {
 
       const response = await sendQuery(query, token);
 
-      const returnedForms = response.body.data.forms.find.forms;
+      const returnedForms = response.body.data.forms.nodes;
       const returnedIds = returnedForms.map(rf => rf.id);
 
       expect(returnedForms).toHaveLength(formsQuantity);
@@ -107,19 +105,17 @@ describe('The forms query', async () => {
       return {
         query: `
         query {
-          forms {
-            findById(formId: "${formId}") {              
+          form(formId: "${formId}") {
+            id
+            title
+            description
+            enabled
+            questions {
               id
               title
               description
-              enabled
-              questions {
-                id
-                title
-                description
-                required                  
-              }                
-            }
+              required                  
+            }                
           }
         }
       `,
@@ -144,7 +140,7 @@ describe('The forms query', async () => {
 
       const response = await sendQuery(query, token);
 
-      const returnedForm = response.body.data.forms.findById;
+      const returnedForm = response.body.data.form;
 
       expect(returnedForm).toBeDefined();
       expect(form).toMatchObject(returnedForm);

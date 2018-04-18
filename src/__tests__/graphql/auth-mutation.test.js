@@ -60,16 +60,14 @@ describe('The auth mutation', async () => {
       const query = {
         query: `
         mutation {
-          auth {
-            signup(name: "${name}", email: "${email}", password: "password")
-          }
+          signup(name: "${name}", email: "${email}", password: "password")
         }
       `,
       };
 
       const res = await postQuery(query);
 
-      const token = res.body.data.auth.signup;
+      const token = res.body.data.signup;
       const user = await userRepository.findByEmail(email);
 
       expect(user).not.toBeNull();
@@ -93,9 +91,7 @@ describe('The auth mutation', async () => {
       const query = {
         query: `
         mutation {
-          auth {
-            signup(name: "${user.name}", email: "${user.email}", password: "${user.password}")
-          }
+          signup(name: "${user.name}", email: "${user.email}", password: "${user.password}")
         }
       `,
       };
@@ -119,10 +115,8 @@ describe('The auth mutation', async () => {
 
       const query = {
         query: `
-        mutation {
-          auth {
-            signin(email: "${user.email}", password: "${user.password}")
-          }
+        mutation {          
+          signin(email: "${user.email}", password: "${user.password}")
         }
       `,
       };
@@ -130,7 +124,7 @@ describe('The auth mutation', async () => {
       await userRepository.create(user);
 
       const res = await postQuery(query);
-      const token = res.body.data.auth.signin;
+      const token = res.body.data.signin;
 
       expect(token).toBeValidJsonWebTokenWith({
         user: { id: user.id, name: user.name },
@@ -147,9 +141,7 @@ describe('The auth mutation', async () => {
       const query = {
         query: `
         mutation {
-          auth {
-            signin(email: "${user.email}", password: "any-invalid-pwd")
-          }
+          signin(email: "${user.email}", password: "any-invalid-pwd")
         }
       `,
       };
@@ -172,16 +164,14 @@ describe('The auth mutation', async () => {
       const query = {
         query: `
         mutation {
-          auth {
-            signinWithFacebook(accessToken: "${testUser.accessToken}")
-          }
+          signinWithFacebook(accessToken: "${testUser.accessToken}")
         }
       `,
       };
 
       const res = await postQuery(query);
 
-      const token = res.body.data.auth.signinWithFacebook;
+      const token = res.body.data.signinWithFacebook;
       const user = await userRepository.findByEmail(testUser.email);
 
       expect(user).not.toBeNull();
@@ -199,9 +189,7 @@ describe('The auth mutation', async () => {
       const query = {
         query: `
         mutation {
-          auth {
-            signinWithFacebook(accessToken: "${invalidAccessToken}")
-          }
+          signinWithFacebook(accessToken: "${invalidAccessToken}")
         }
       `,
       };

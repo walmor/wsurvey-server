@@ -24,12 +24,10 @@ function getCurrentUserQuery() {
   return {
     query: `
         query {
-          auth {
-            currentUser {
-              id,
-              name,
-              email
-            }
+          viewer {
+            id,
+            name,
+            email
           }
         }
       `,
@@ -54,7 +52,7 @@ describe('The auth query', async () => {
 
     const res = await sendCurrentUserQuery(noToken);
 
-    const userData = res.body.data.auth.currentUser;
+    const userData = res.body.data.viewer;
 
     expect(userData).toBeNull();
   });
@@ -80,9 +78,9 @@ describe('The auth query', async () => {
 
     const res = await sendCurrentUserQuery(token);
 
-    const { currentUser } = res.body.data.auth;
+    const { viewer } = res.body.data;
 
-    expect(currentUser.email).toEqual(user.email);
-    expect(currentUser.name).toEqual(user.name);
+    expect(viewer.email).toEqual(user.email);
+    expect(viewer.name).toEqual(user.name);
   });
 });

@@ -346,8 +346,8 @@ describe('The form repository', async () => {
         search,
       });
 
-      expect(result.forms).toContainEqual(form1);
-      expect(result.forms).toContainEqual(form2);
+      expect(result.nodes).toContainEqual(form1);
+      expect(result.nodes).toContainEqual(form2);
     });
 
     it('should search by the form description', async () => {
@@ -366,8 +366,8 @@ describe('The form repository', async () => {
         search,
       });
 
-      expect(result.forms).toContainEqual(form1);
-      expect(result.forms).toContainEqual(form2);
+      expect(result.nodes).toContainEqual(form1);
+      expect(result.nodes).toContainEqual(form2);
     });
 
     it('should return forms ordered by descending creation date', async () => {
@@ -385,9 +385,9 @@ describe('The form repository', async () => {
         userId: user.id,
       });
 
-      expect(result.forms).toHaveLength(totalCount);
-      expect(result.forms[0]).toMatchObject(first);
-      expect(result.forms[result.forms.length - 1]).toMatchObject(last);
+      expect(result.nodes).toHaveLength(totalCount);
+      expect(result.nodes[0]).toMatchObject(first);
+      expect(result.nodes[result.nodes.length - 1]).toMatchObject(last);
     });
 
     it('should return a specific page', async () => {
@@ -408,9 +408,9 @@ describe('The form repository', async () => {
         userId: user.id,
       });
 
-      expect(result.forms).toHaveLength(pageSize);
-      expect(result.forms[0]).toMatchObject(first);
-      expect(result.forms[result.forms.length - 1]).toMatchObject(last);
+      expect(result.nodes).toHaveLength(pageSize);
+      expect(result.nodes[0]).toMatchObject(first);
+      expect(result.nodes[result.nodes.length - 1]).toMatchObject(last);
     });
 
     it('should return at most the given page size', async () => {
@@ -427,7 +427,7 @@ describe('The form repository', async () => {
       });
 
       expect(result.totalCount).toEqual(totalCount);
-      expect(result.forms).toHaveLength(pageSize);
+      expect(result.nodes).toHaveLength(pageSize);
     });
 
     it('should not return deleted forms', async () => {
@@ -443,9 +443,9 @@ describe('The form repository', async () => {
         userId: user.id,
       });
 
-      expect(result.forms).toHaveLength(5);
-      expect(result.forms).not.toContainEqual(form1);
-      expect(result.forms).not.toContainEqual(form2);
+      expect(result.nodes).toHaveLength(5);
+      expect(result.nodes).not.toContainEqual(form1);
+      expect(result.nodes).not.toContainEqual(form2);
     });
 
     it('should not return other users forms', async () => {
@@ -461,9 +461,9 @@ describe('The form repository', async () => {
         userId: user1.id,
       });
 
-      expect(result.forms).toHaveLength(1);
-      expect(result.forms).toContainEqual(user1Form);
-      expect(result.forms).not.toContainEqual(user2form);
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes).toContainEqual(user1Form);
+      expect(result.nodes).not.toContainEqual(user2form);
     });
   });
 

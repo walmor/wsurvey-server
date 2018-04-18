@@ -1,16 +1,13 @@
-import authController from '../controllers/auth-controller';
-import formsController from '../controllers/forms-controller';
+import { merge } from 'lodash';
+import { authQueryResolver, authMutationResolver } from './auth-resolvers';
+import { formQueryResolver, formMutationResolver } from './form-resolvers';
+
+const Query = merge(authQueryResolver, formQueryResolver);
+const Mutation = merge(authMutationResolver, formMutationResolver);
 
 const rootResolver = {
-  Query: {
-    auth: () => authController,
-    forms: () => formsController,
-  },
-
-  Mutation: {
-    auth: () => authController,
-    forms: () => formsController,
-  },
+  Query,
+  Mutation,
 };
 
 export default rootResolver;
