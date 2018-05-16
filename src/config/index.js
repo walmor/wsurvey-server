@@ -34,6 +34,12 @@ const schema = {
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID,
   },
+  ssl: {
+    keyFile: process.env.SSL_KEY_FILE,
+    certFile: process.env.SSL_CERT_FILE,
+    caFile: process.env.SSL_CA_FILE,
+    passphrase: process.env.SSL_PASSPHRASE,
+  },
 };
 
 // Default configurations
